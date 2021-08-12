@@ -241,12 +241,7 @@ extension MonthView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch style.month.scrollDirection {
-        case .horizontal:
-            return monthData.rowsInPage * monthData.columns
-        default:
-            return monthData.data.months[section].days.count
-        }
+        monthData.data.months[section].days.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
