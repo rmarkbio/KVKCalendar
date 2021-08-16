@@ -113,6 +113,7 @@ final class MonthData: EventDateProtocol {
         var displayableEvents = [Event]()
         let updatedDays = days.reduce([], { (acc, day) -> [Day] in
             var newDay = day
+            newDay.events = []
             guard newDay.events.isEmpty else { return acc + [day] }
             
             let filteredEventsByDay = events.filter({ compareStartDate(day.date, with: $0) && !$0.isAllDay })

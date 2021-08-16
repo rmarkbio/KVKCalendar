@@ -439,25 +439,44 @@ extension MonthView: MonthCellDelegate {
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
         scrollToDate(newDate, animated: true)
         didSelectDates([newDate], indexPath: index)
-        collectionView?.isScrollEnabled = true
+        collectionView?.isScrollEnabled = style.month.isScrollEnabled
     }
     
     func didChangeMoveEvent(gesture: UIPanGestureRecognizer) {
-        let point = gesture.location(in: collectionView)
-        guard (collectionView?.frame.width ?? 0) >= (point.x + 20), (point.x - 20) >= 0 else { return }
         
-        var offset = collectionView?.contentOffset ?? .zero
-        let contentSize = collectionView?.contentSize ?? .zero
-        if (point.y - 80) < offset.y, (point.y - (eventPreview?.bounds.height ?? 50)) >= 0 {
-            // scroll up
-            offset.y -= 5
-            collectionView?.setContentOffset(offset, animated: false)
-        } else if (point.y + 80) > (offset.y + (collectionView?.bounds.height ?? 0)), point.y + (eventPreview?.bounds.height ?? 50) <= contentSize.height {
-            // scroll down
-            offset.y += 5
-            collectionView?.setContentOffset(offset, animated: false)
+        guard let view =  collectionView else { return }
+        
+        let point = gesture.location(in: collectionView)
+        var offset = view.contentOffset
+       
+        switch style.month.scrollDirection {
+        case .horizontal:
+            adjustPosition(point, view.bounds, adjust: { direction in
+                offset.x += 5.0 * direction
+            })
+        default:
+            adjustPosition(point, view.bounds, adjust: { direction in
+                offset.y += 5.0 * direction
+            })
         }
+
+        collectionView?.setContentOffset(offset, animated: false)
         
         eventPreview?.frame.origin = CGPoint(x: point.x - monthData.eventPreviewXOffset, y: point.y - monthData.eventPreviewYOffset)
+    }
+    
+    private func adjustPosition(_ point: CGPoint,
+                                _ rect: CGRect,
+                                _ offset: CGFloat = 50.0,
+                                adjust: @escaping  (_ direction: CGFloat ) -> Void) {
+       
+        if (point.x - offset) < rect.origin.x ||
+            (point.y - offset) < rect.origin.y {
+            adjust(-1)
+        }
+        if (point.x + offset) > (rect.origin.x + rect.width) ||
+            (point.y + offset) > (rect.origin.y + rect.height) {
+            adjust(1)
+        }
     }
 }
