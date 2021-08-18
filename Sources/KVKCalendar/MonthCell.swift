@@ -211,6 +211,7 @@ final class MonthCell: UICollectionViewCell {
         }
     }
     
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -230,6 +231,11 @@ final class MonthCell: UICollectionViewCell {
         if #available(iOS 13.4, *) {
             addPointInteraction(on: self, delegate: self)
         }
+        
+        let longGesture = UILongPressGestureRecognizer(target: self, action: #selector(onLongTap))
+        longGesture.delegate = self
+        longGesture.minimumPressDuration = style.event.minimumPressDuration
+        self.addGestureRecognizer(longGesture)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -274,6 +280,13 @@ final class MonthCell: UICollectionViewCell {
         default:
             break
         }
+    }
+    
+    @objc func onLongTap(gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began, let selectedDate = day.date else { return }
+        var newEvent = Event(ID: Event.idForNewEvent)
+        newEvent.text = style.event.textForNewEvent
+        delegate?.didAddNewEvent(newEvent, on: selectedDate)
     }
     
     private func populateCell(day: Day, label: UILabel, view: UIView) {
@@ -385,7 +398,7 @@ final class MonthCell: UICollectionViewCell {
 
 extension MonthCell: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
+        gestureRecognizer.view == otherGestureRecognizer.view
     }
 }
 
@@ -408,4 +421,5 @@ protocol MonthCellDelegate: AnyObject {
     func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
     func didEndMoveEvent(gesture: UILongPressGestureRecognizer)
     func didChangeMoveEvent(gesture: UIPanGestureRecognizer)
+    func didAddNewEvent(_ event: Event, on date: Date)
 }

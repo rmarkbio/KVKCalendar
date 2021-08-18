@@ -362,7 +362,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
             
             if style.month.isPagingEnabled {
                 height = collectionView.frame.height / 6
-            } else {                
+            } else {
                 switch UIDevice.current.userInterfaceIdiom {
                 case .phone:
                     height = collectionView.frame.height / 7
@@ -379,6 +379,7 @@ extension MonthView: UICollectionViewDelegate, UICollectionViewDelegateFlowLayou
 }
 
 extension MonthView: MonthCellDelegate {
+    
     func didSelectEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectEvent(event, type: .month, frame: frame)
     }
@@ -463,6 +464,10 @@ extension MonthView: MonthCellDelegate {
         collectionView?.setContentOffset(offset, animated: false)
         
         eventPreview?.frame.origin = CGPoint(x: point.x - monthData.eventPreviewXOffset, y: point.y - monthData.eventPreviewYOffset)
+    }
+    
+    func didAddNewEvent(_ event: Event, on date: Date) {
+        delegate?.didAddNewEvent(event, date)
     }
     
     private func adjustPosition(_ point: CGPoint,
