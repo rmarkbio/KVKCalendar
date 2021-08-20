@@ -121,7 +121,7 @@ final class MonthCell: UICollectionViewCell {
                                                                   bulletAttributes: [.font: monthStyle.fontEventBullet,
                                                                                      .foregroundColor: event.color?.value ?? .systemGray],
                                                                   timeAttributes: [.font: monthStyle.fontEventTime,
-                                                                                   .foregroundColor: UIColor.systemGray],
+                                                                                   .foregroundColor: monthStyle.colorEventTime],
                                                                   indentation: 0,
                                                                   lineSpacing: 0,
                                                                   paragraphSpacing: 0)
@@ -205,8 +205,7 @@ final class MonthCell: UICollectionViewCell {
     
     @objc private func tapOnMore(gesture: UITapGestureRecognizer) {
         if let idx = events.firstIndex(where: { $0.start.day == gesture.view?.tag }) {
-            let location = gesture.location(in: superview)
-            let newFrame = CGRect(x: location.x, y: location.y, width: gesture.view?.frame.width ?? 0, height: gesture.view?.frame.size.height ?? 0)
+            let newFrame = superview?.superview?.convert(frame, from: superview)
             delegate?.didSelectMore(events[idx].start, frame: newFrame)
         }
     }
@@ -355,7 +354,7 @@ final class MonthCell: UICollectionViewCell {
         label.clipsToBounds = true
     }
     
-    private func addIconBeforeLabel(eventList: [Event], textAttributes: [NSAttributedString.Key: Any], bulletAttributes: [NSAttributedString.Key: Any], timeAttributes: [NSAttributedString.Key: Any], bullet: String = "\u{2022}", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10) -> NSAttributedString {
+    private func addIconBeforeLabel(eventList: [Event], textAttributes: [NSAttributedString.Key: Any], bulletAttributes: [NSAttributedString.Key: Any], timeAttributes: [NSAttributedString.Key: Any], bullet: String = "\u{2022} ", indentation: CGFloat = 10, lineSpacing: CGFloat = 2, paragraphSpacing: CGFloat = 10) -> NSAttributedString {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = UIDevice.current.userInterfaceIdiom == .pad ? .left : .center
         paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: indentation, options: [:])]
@@ -363,7 +362,7 @@ final class MonthCell: UICollectionViewCell {
         paragraphStyle.lineSpacing = lineSpacing
         paragraphStyle.paragraphSpacing = paragraphSpacing
         paragraphStyle.headIndent = indentation
-        paragraphStyle.lineBreakMode = .byTruncatingMiddle
+        paragraphStyle.lineBreakMode = .byTruncatingTail
         
         return eventList.reduce(NSMutableAttributedString()) { (_, event) -> NSMutableAttributedString in
             let text: String
@@ -373,12 +372,19 @@ final class MonthCell: UICollectionViewCell {
                 text = event.textForMonth
             }
             
-            let formattedString: String
+            var formattedString = ""
+            
             if !monthStyle.isHiddenDotInTitle {
-                formattedString = "\(bullet) \(text)\n"
-            } else {
-                formattedString = "\(text)\n"
+                formattedString += "\(bullet)"
             }
+            
+            if !monthStyle.isHiddenTime {
+                formattedString += "\(event.textStartTime)"
+            }
+            
+            formattedString += "\(text)\n"
+           
+            
             let attributedString = NSMutableAttributedString(string: formattedString)
             let string: NSString = NSString(string: formattedString)
             
@@ -389,6 +395,11 @@ final class MonthCell: UICollectionViewCell {
             if !monthStyle.isHiddenDotInTitle {
                 let rangeForBullet = string.range(of: bullet)
                 attributedString.addAttributes(bulletAttributes, range: rangeForBullet)
+            }
+            
+            if !monthStyle.isHiddenTime {
+                let rangeTime = string.range(of: event.textStartTime)
+                attributedString.addAttributes(timeAttributes, range: rangeTime)
             }
             
             return attributedString

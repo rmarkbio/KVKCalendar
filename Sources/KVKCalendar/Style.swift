@@ -259,6 +259,7 @@ public struct MonthStyle {
     public var isHiddenMoreTitle: Bool = false
     public var colorMoreTitle: UIColor = .gray
     public var colorEventTitle: UIColor = .black
+    public var colorEventTime: UIColor = .black
     public var weekFont: UIFont = .boldSystemFont(ofSize: 14)
     public var fontEventTitle: UIFont = .systemFont(ofSize: 14)
     public var fontEventTime: UIFont = .systemFont(ofSize: 10)
@@ -282,6 +283,7 @@ public struct MonthStyle {
     public var eventCorners: UIRectCorner = .allCorners
     public var eventCornersRadius: CGSize = CGSize(width: 5, height: 5)
     public var isHiddenDotInTitle: Bool = false
+    public var isHiddenTime: Bool = false
     public var isHiddenTitle: Bool = false
     public var weekDayAlignment: NSTextAlignment = .right
     public var titleDateAlignment: NSTextAlignment = .left
@@ -378,7 +380,7 @@ public struct AllDayStyle {
     public var font: UIFont = .systemFont(ofSize: 12)
     
     public var offsetWidth: CGFloat = 2
-    public var offsetHeight: CGFloat = 2    
+    public var offsetHeight: CGFloat = 2
     public var offsetX: CGFloat = 0
     public var height: CGFloat = 25
     public var maxHeight: CGFloat = 70
@@ -442,7 +444,7 @@ extension Style {
         guard followInSystemTheme else { return self }
         
         var newStyle = self
-        if #available(iOS 13.0, *) {            
+        if #available(iOS 13.0, *) {
             // event
             newStyle.event.colorIconFile = UIColor.useForStyle(dark: .systemGray, white: newStyle.event.colorIconFile)
             
