@@ -136,6 +136,7 @@ public struct TimelineStyle {
     public var minimumPressDuration: TimeInterval = 0.5
     public var isHiddenStubEvent: Bool = false
     public var isEnabledCreateNewEvent: Bool = true
+    public var allowBouncing: Bool = true
     
     @available(swift, deprecated: 0.5.1, obsoleted: 0.5.2, renamed: "maxLimitCachedPages")
     public var maxLimitChachedPages: UInt = 10

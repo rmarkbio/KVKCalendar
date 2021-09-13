@@ -75,6 +75,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) lazy var scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.delegate = self
+        scroll.bounces = style.timeline.allowBouncing
         return scroll
     }()
     
