@@ -103,6 +103,7 @@ public struct Event {
     public var text: String = ""
     public var start: Date = Date()
     public var end: Date = Date()
+    public var currentDate = Date()
     public var color: Event.Color? = Event.Color(.systemBlue) {
         didSet {
             guard let tempColor = color else { return }

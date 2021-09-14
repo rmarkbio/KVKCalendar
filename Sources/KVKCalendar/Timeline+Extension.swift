@@ -42,7 +42,7 @@ extension TimelineView: UIScrollViewDelegate {
         
         let stubEvents = events + eventsAllDay
         stubEvents.forEach { (eventView) in
-            guard let stack = getStubStackView(day: eventView.event.start.day) else { return }
+            guard let stack = getStubStackView(day: eventView.event.currentDate.day) else { return }
             
             stack.top.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
             stack.bottom.subviews.filter({ ($0 as? StubEventView)?.valueHash == eventView.event.hash }).forEach({ $0.removeFromSuperview() })
