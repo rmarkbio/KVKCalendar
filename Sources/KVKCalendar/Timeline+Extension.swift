@@ -430,11 +430,11 @@ extension TimelineView: ResizeEventViewDelegate {
 // MARK: EventDelegate
 extension TimelineView: EventDelegate {
     var eventPreviewXOffset: CGFloat {
-        return eventPreviewSize.width * 0.5
+        return eventPreviewSize.width * style.timeline.newEventOffsetKoef
     }
     
     var eventPreviewYOffset: CGFloat {
-        return eventPreviewSize.height * 0.7
+        return eventPreviewSize.height * style.timeline.newEventOffsetKoef
     }
     
     func deselectEvent(_ event: Event) {

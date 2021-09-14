@@ -87,6 +87,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         self.eventLayout = style.timeline.eventLayout
         super.init(frame: frame)
         
+        eventPreviewSize = CGSize(width: 150, height: style.timeline.heightTime + style.timeline.offsetTimeY)
+        
         var scrollFrame = frame
         scrollFrame.origin.y = 0
         scrollView.frame = scrollFrame
