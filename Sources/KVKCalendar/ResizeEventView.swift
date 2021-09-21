@@ -35,6 +35,7 @@ final class ResizeEventView: UIView {
     private lazy var bottomView = createPanView(type: .bottom)
     private let mainHeightOffset: CGFloat = 30
     private let style: Style
+    private var deleteButton: UIButton!
     
     var haveNewSize: (needSave: Bool, frame: CGRect) {
         guard originalFrameEventView.height != eventView.frame.height else {
@@ -112,6 +113,17 @@ final class ResizeEventView: UIView {
         if #available(iOS 13.4, *) {
             addPointInteraction(on: self, delegate: self)
         }
+        
+        //delete button
+        deleteButton = UIButton(type: .system)
+        deleteButton.tintColor = event.textColor
+        deleteButton.setImage(style.timeline.closeIcon, for: .normal)
+        deleteButton.addTarget(self,
+                         action: #selector(deleteButtonTapped),
+                         for: .touchUpInside)
+        deleteButton.frame = CGRect(x: eventView.frame.width - 20.0, y: mainYOffset + 5.0, width: 20.0, height: 20.0)
+        
+        addSubview(deleteButton)
     }
     
     func updateHeight() {
@@ -133,6 +145,10 @@ final class ResizeEventView: UIView {
         default:
             break
         }
+    }
+    
+    @objc private func deleteButtonTapped(_ sender: Any?) {
+        self.delegate?.didDelete(event: event)
     }
     
     required init?(coder: NSCoder) {
@@ -171,4 +187,5 @@ protocol ResizeEventViewDelegate: AnyObject {
     func didStartMoveResizeEvent(_ event: Event, gesture: UIPanGestureRecognizer, view: UIView)
     func didEndMoveResizeEvent(_ event: Event, gesture: UIPanGestureRecognizer)
     func didChangeMoveResizeEvent(_ event: Event, gesture: UIPanGestureRecognizer)
+    func didDelete(event: Event)
 }

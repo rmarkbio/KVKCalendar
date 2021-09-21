@@ -385,6 +385,9 @@ public protocol CalendarDelegate: AnyObject {
     
     /// deselect event on timeline
     func didDeselectEvent(_ event: Event, animated: Bool)
+    
+    /// delete event
+    func didDeleteEvent(_ event: Event)
 }
 
 public extension CalendarDelegate {
@@ -415,6 +418,8 @@ public extension CalendarDelegate {
     func didDeselectEvent(_ event: Event, animated: Bool) {}
     
     func didChangeViewerFrame(_ frame: CGRect) {}
+    
+    func didDeleteEvent(_ event: Event) {}
 }
 
 // MARK: - Private Display dataSource

@@ -425,6 +425,10 @@ extension TimelineView: ResizeEventViewDelegate {
     func didEndMoveResizeEvent(_ event: Event, gesture: UIPanGestureRecognizer) {
         
     }
+    
+    func didDelete(event: Event) {
+        delegate?.didDeleteEvent(event)
+    }
 }
 
 // MARK: EventDelegate

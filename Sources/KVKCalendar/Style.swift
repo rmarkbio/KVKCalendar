@@ -138,6 +138,7 @@ public struct TimelineStyle {
     public var isEnabledCreateNewEvent: Bool = true
     public var allowBouncing: Bool = true
     public var newEventOffsetKoef: CGFloat = 0.1
+    public var closeIcon: UIImage? = nil
     
     @available(swift, deprecated: 0.5.1, obsoleted: 0.5.2, renamed: "maxLimitCachedPages")
     public var maxLimitChachedPages: UInt = 10

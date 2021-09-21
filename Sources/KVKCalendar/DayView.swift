@@ -280,6 +280,10 @@ extension DayView: TimelineDelegate {
         delegate?.didChangeEvent(event, start: startDate, end: endDate)
     }
     
+    func didDeleteEvent(_ event: Event) {
+        delegate?.didDeleteEvent(event)
+    }
+    
 }
 
 extension DayView: CalendarSettingProtocol {
