@@ -462,20 +462,12 @@ extension TimelineView: EventDelegate {
             viewFrame.size.height = 60
         }
         
-        let viewTmp: UIView
-        if view is EventView {
-            let eventView = EventView(event: event, style: style, frame: viewFrame)
-            eventView.textView.isHidden = false
-            eventView.selectEvent()
-            eventView.isUserInteractionEnabled = false
-            viewTmp = eventView
-            viewTmp.frame = viewFrame
-        } else {
-            viewTmp = view.snapshotView(afterScreenUpdates: false) ?? view
-            viewTmp.frame = viewFrame
-        }
+        let eventView = EventView(event: event, style: style, frame: viewFrame)
+        eventView.textView.isHidden = false
+        eventView.selectEvent()
+        eventView.isUserInteractionEnabled = false
         
-        eventResizePreview = ResizeEventView(view: viewTmp, event: event, frame: viewTmp.frame, style: style)
+        eventResizePreview = ResizeEventView(view: eventView, event: event, frame: eventView.frame, style: style)
         eventResizePreview?.delegate = self
         if let resizeView = eventResizePreview {
             scrollView.addSubview(resizeView)
