@@ -240,6 +240,10 @@ extension CalendarView: DisplayDelegate {
         newFrame.origin = .zero
         delegate?.didChangeViewerFrame(newFrame)
     }
+    
+    public func didDeleteEvent(_ event: Event) {
+        delegate?.didDeleteEvent(event)
+    }
 }
 
 extension CalendarView: CalendarSettingProtocol {
