@@ -25,6 +25,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     var eventPreviewSize = CGSize(width: 150, height: 150)
     var isResizeEnableMode = false
     
+    var xDeltaNewEvent: CGFloat = 0.0
+    
     let timeLabelFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"

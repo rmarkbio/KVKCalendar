@@ -486,10 +486,13 @@ extension TimelineView: EventDelegate {
         let location = gesture.location(in: scrollView)
         
         shadowView.removeFromSuperview()
+    
         if let value = moveShadowView(pointX: location.x) {
             shadowView.frame = value.frame
             shadowView.date = value.date
             scrollView.addSubview(shadowView)
+            xDeltaNewEvent = location.x - value.frame.origin.x
+            
         }
     
         eventPreview?.removeFromSuperview()
@@ -506,7 +509,7 @@ extension TimelineView: EventDelegate {
             if let size = eventPreview?.frame.size {
                 eventPreviewSize = size
             }
-            eventPreview?.frame.origin = CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset)
+            eventPreview?.frame.origin = CGPoint(x: location.x - xDeltaNewEvent, y: location.y - eventPreviewYOffset)
         }
         
         eventPreview?.alpha = 0.9
@@ -566,7 +569,7 @@ extension TimelineView: EventDelegate {
             scrollView.setContentOffset(offset, animated: false)
         }
         
-        eventPreview?.frame.origin = CGPoint(x: location.x - eventPreviewXOffset, y: location.y - eventPreviewYOffset)
+        eventPreview?.frame.origin = CGPoint(x: location.x - xDeltaNewEvent, y: location.y - eventPreviewYOffset)
         let offsetMinutes = eventPreviewYOffset - style.timeline.offsetEvent - 6
         showChangingMinute(pointY: location.y, offset: offsetMinutes)
         
