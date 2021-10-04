@@ -189,12 +189,14 @@ public struct TimelineStyle {
     }
     
     public enum CurrentLineHourScrollMode: Equatable {
-        case always, today, forDate(Date)
+        case always, never, today, forDate(Date)
         
         func scrollForDates(_ dates: [Date?]) -> Bool {
             switch self {
             case .always:
                 return true
+            case .never:
+                return false
             case .today:
                 let todayDate = Date()
                 return dates.contains(where: { todayDate.year == $0?.year && todayDate.month == $0?.month && todayDate.day == $0?.day })

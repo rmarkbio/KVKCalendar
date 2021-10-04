@@ -462,8 +462,6 @@ extension TimelineView: EventDelegate {
             viewFrame.size.height = 60
         }
         
-        view.alpha = 0.3
-        
         let eventView = EventView(event: event, style: style, frame: viewFrame)
         eventView.textView.isHidden = false
         eventView.selectEvent()
