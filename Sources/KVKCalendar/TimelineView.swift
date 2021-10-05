@@ -283,7 +283,10 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             bringSubviewToFront(verticalLine)
             
             let eventsByDate = filteredEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) || checkMultipleDate(date, with: $0) })
-            let allDayEventsForDate = filteredAllDayEvents.filter({ compareStartDate(date, with: $0) || compareEndDate(date, with: $0) }).compactMap { (oldEvent) -> Event in
+            let allDayEventsForDate = filteredAllDayEvents.filter({
+                guard let date = date else { return false }
+                return DateInterval(start: $0.start, end: $0.end).contains(date)
+            }).compactMap { (oldEvent) -> Event in
                 var updatedEvent = oldEvent
                 updatedEvent.start = date ?? oldEvent.start
                 updatedEvent.end = date ?? oldEvent.end
