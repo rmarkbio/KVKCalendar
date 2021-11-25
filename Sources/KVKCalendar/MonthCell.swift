@@ -8,9 +8,16 @@
 import UIKit
 
 final class MonthCell: UICollectionViewCell {
-    private let titlesCount = 3
-    private let countInCell: CGFloat = 4
+    
     private let offset: CGFloat = 3
+    
+    private var titlesCount: Int {
+        return Int((frame.height - dateLabel.bounds.height) / itemHeight) - 1
+    }
+    
+    private var itemHeight: CGFloat {
+        monthStyle.fontEventTitle.lineHeight * 1.2
+    }
     
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
@@ -80,13 +87,11 @@ final class MonthCell: UICollectionViewCell {
             if UIDevice.current.userInterfaceIdiom == .phone, UIDevice.current.orientation.isLandscape {
                 return
             }
-            
-            let height = (frame.height - dateLabel.bounds.height - 5) / countInCell
-            
+        
             for (idx, event) in events.enumerated() {
                 let width = frame.width - 10
                 let count = idx + 1
-                let label = UILabel(frame: CGRect(x: 5, y: 5 + dateLabel.bounds.height + height * CGFloat(idx), width: width, height: height))
+                let label = UILabel(frame: CGRect(x: 5, y: dateLabel.bounds.height + itemHeight * CGFloat(idx), width: width, height: itemHeight))
                 label.isUserInteractionEnabled = true
                 
                 if count > titlesCount {
@@ -105,7 +110,7 @@ final class MonthCell: UICollectionViewCell {
                         if monthStyle.moreTitle.isEmpty {
                             text = "\(events.count - titlesCount)"
                         } else if frame.height > 80 {
-                            text = "\(monthStyle.moreTitle) \(events.count - titlesCount)"
+                            text = "\(events.count - titlesCount) \(monthStyle.moreTitle)"
                         } else {
                             text = ""
                         }
