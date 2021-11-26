@@ -129,8 +129,13 @@ extension TimelineView {
         return UIApplication.shared.isAvailableBottomHomeIndicator ? 30 : 5
     }
     
-    func topStabStackOffsetY(allDayEventsIsPinned: Bool, eventsCount: Int, height: CGFloat) -> CGFloat {
-        return allDayEventsIsPinned ? (CGFloat(eventsCount) * height) + 5 : 5
+    func topStabStackOffsetY(allDayEventsIsPinned: Bool, eventsCount: Int, style: Style) -> CGFloat {
+        guard eventsCount > 0, allDayEventsIsPinned else {
+            return 5.0
+        }
+        return eventsCount > 4
+        ? style.allDay.maxHeight + 5
+        : style.allDay.height * 2 + 5
     }
     
     var scrollableEventViews: [UIView] {
