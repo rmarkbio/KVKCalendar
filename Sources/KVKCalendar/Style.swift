@@ -121,7 +121,7 @@ public struct TimelineStyle {
     
     @available(swift, deprecated: 0.4.2, obsoleted: 0.4.3, renamed: "scrollLineHourMode")
     public var scrollToCurrentHour: Bool = true
-    public var scrollLineHourMode: CurrentLineHourScrollMode = .today
+    public var scrollLineHourMode: CurrentLineHourScrollMode = .today(nil)
     
     public var currentLineHourFont: UIFont = .systemFont(ofSize: 12)
     public var currentLineHourColor: UIColor = .red
@@ -189,22 +189,48 @@ public struct TimelineStyle {
     }
     
     public enum CurrentLineHourScrollMode: Equatable {
-        case always, never, today, forDate(Date)
+        case always, never, today(Time?), forDate(Date)
         
-        func scrollForDates(_ dates: [Date?]) -> Bool {
+        func canScroll(for dates: [Date?]) -> Date? {
             switch self {
             case .always:
-                return true
+                return Date()
             case .never:
-                return false
-            case .today:
-                let todayDate = Date()
-                return dates.contains(where: { todayDate.year == $0?.year && todayDate.month == $0?.month && todayDate.day == $0?.day })
+                return nil
+            case .today(let time):
+                guard dates.compactMap{$0}.contains( where: {Calendar.current.isDate($0, inSameDayAs: Date())})  else {
+                    return nil
+                }
+                guard let time = time else {
+                    return Date()
+                }
+                return  Calendar.current.date(bySettingHour: time.hour, minute: time.minute, second: time.second, of: Date())
             case let .forDate(customDate):
-                return dates.contains(where: { customDate.year == $0?.year && customDate.month == $0?.month && customDate.day == $0?.day })
+                guard dates.compactMap{$0}.contains( where: {Calendar.current.isDate($0, inSameDayAs: customDate)})  else {
+                    return nil
+                }
+                return Date()
             }
         }
     }
+    
+    public struct Time: Equatable {
+        let hour: Int
+        let minute: Int
+        let second: Int
+        
+       public init?(hour: Int = 0, minute: Int = 0, second: Int = 0) {
+            guard 0...23 ~= hour,
+                  0...59 ~= minute,
+                  0...59 ~= second else {
+                return nil
+            }
+            self.hour = hour
+            self.minute = minute
+            self.second = second
+        }
+    }
+    
 }
 
 // MARK: Week style
