@@ -133,9 +133,12 @@ extension TimelineView {
         guard eventsCount > 0, allDayEventsIsPinned else {
             return 5.0
         }
-        return eventsCount > 4
-        ? style.allDay.maxHeight + 5
-        : style.allDay.height * 2 + 5
+        
+        return (eventsCount > 4
+        ? style.allDay.maxHeight
+        : eventsCount < 2
+                ? style.allDay.height
+                : style.allDay.height * 2) + 5
     }
     
     var scrollableEventViews: [UIView] {

@@ -16,7 +16,7 @@ final class MonthCell: UICollectionViewCell {
     }
     
     private var itemHeight: CGFloat {
-        monthStyle.fontEventTitle.lineHeight * 1.2
+        monthStyle.fontEventTitle.lineHeight * 1.4
     }
     
     private lazy var dateLabel: UILabel = {

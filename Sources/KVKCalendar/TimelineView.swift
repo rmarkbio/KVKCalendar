@@ -358,22 +358,28 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
                 }
             }
             
-            if !style.timeline.isHiddenStubEvent, let day = date?.day {
-                let y = topStabStackOffsetY(allDayEventsIsPinned: style.allDay.isPinned,
-                                            eventsCount: (allDayEventsForDate + filteredAllDayRecurringEvents).count,
-                                            style: style)
-                let topStackFrame = CGRect(x: pointX, y: y, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
-                let bottomStackFrame = CGRect(x: pointX, y: frame.height - bottomStabStackOffsetY, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
-                
-                addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
-                addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
-            }
         }
         
         if let maxEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count, maxEvents > 0 {
             setOffsetScrollView(allDayEventsCount: maxEvents)
             createAllDayEvents(events: allDayEvents, maxEvents: maxEvents)
+            dates.enumerated().forEach { (idx, date) in
+                let pointX: CGFloat = idx == 0 ? leftOffset : CGFloat(idx) * widthPage + leftOffset
+    
+                if !style.timeline.isHiddenStubEvent, let day = date?.day {
+                    let y = topStabStackOffsetY(allDayEventsIsPinned: style.allDay.isPinned,
+                                                eventsCount: maxEvents,
+                                                style: style)
+                    let topStackFrame = CGRect(x: pointX, y: y, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+                    let bottomStackFrame = CGRect(x: pointX, y: frame.height - bottomStabStackOffsetY, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
+                    
+                    addSubview(createStackView(day: day, type: .top, frame: topStackFrame))
+                    addSubview(createStackView(day: day, type: .bottom, frame: bottomStackFrame))
+                }
+            }
         }
+        
+        
         scrollToCurrentTime(startHour)
         showCurrentLineHour()
         addStubInvisibleEvents()
