@@ -204,9 +204,9 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     }
     
     private func scrollToCurrentTime(_ startHour: Int) {
-        guard style.timeline.scrollLineHourMode.scrollForDates(dates) else { return }
+        guard let scrollDate = style.timeline.scrollLineHourMode.canScroll(for: dates) else { return }
         
-        let date = Date().convertTimeZone(TimeZone.current, to: style.timezone)
+        let date = scrollDate.convertTimeZone(TimeZone.current, to: style.timezone)
         guard let time = getTimelineLabel(hour: date.hour)else {
             scrollView.setContentOffset(.zero, animated: true)
             return
