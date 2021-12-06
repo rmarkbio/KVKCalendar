@@ -49,6 +49,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
     private(set) var selectedDate: Date?
     private(set) var type: CalendarType
     private(set) var eventLayout: TimelineEventLayout
+    private var startScrollHour: Int?
 
     private(set) lazy var shadowView: ShadowDayView = {
         let view = ShadowDayView()
@@ -96,6 +97,7 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         scrollView.frame = scrollFrame
         addSubview(scrollView)
         setUI()
+        startScrollHour = style.timeline.startHour
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(forceDeselectEvent))
         addGestureRecognizer(tap)
@@ -203,11 +205,8 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         return pointY
     }
     
-    private func scrollToCurrentTime(_ startHour: Int) {
-        guard let scrollDate = style.timeline.scrollLineHourMode.canScroll(for: dates) else { return }
-        
-        let date = scrollDate.convertTimeZone(TimeZone.current, to: style.timezone)
-        guard let time = getTimelineLabel(hour: date.hour)else {
+    private func scrollToTime(_ startHour: Int) {
+        guard let time = getTimelineLabel(hour: startHour)else {
             scrollView.setContentOffset(.zero, animated: true)
             return
         }
@@ -379,8 +378,13 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
             }
         }
         
-        
-        scrollToCurrentTime(startHour)
+        if let scrollHour = startScrollHour {
+            scrollToTime(scrollHour)
+            startScrollHour = nil // it's only for the first time
+        }else if let scrollHour = style.timeline.scrollLineHourMode.canScroll(for: dates) {
+            scrollToTime(scrollHour)
+        }
+
         showCurrentLineHour()
         addStubInvisibleEvents()
     }

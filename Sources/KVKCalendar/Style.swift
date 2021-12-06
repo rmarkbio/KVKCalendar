@@ -191,25 +191,23 @@ public struct TimelineStyle {
     public enum CurrentLineHourScrollMode: Equatable {
         case always, never, today(Time?), forDate(Date)
         
-        func canScroll(for dates: [Date?]) -> Date? {
+        func canScroll(for dates: [Date?]) -> Int? {
             switch self {
             case .always:
-                return Date()
+                return Date().hour
             case .never:
                 return nil
             case .today(let time):
                 guard dates.compactMap{$0}.contains( where: {Calendar.current.isDate($0, inSameDayAs: Date())})  else {
                     return nil
                 }
-                guard let time = time else {
-                    return Date()
-                }
-                return  Calendar.current.date(bySettingHour: time.hour, minute: time.minute, second: time.second, of: Date())
+                
+                return time?.hour ?? Date().hour
             case let .forDate(customDate):
                 guard dates.compactMap{$0}.contains( where: {Calendar.current.isDate($0, inSameDayAs: customDate)})  else {
                     return nil
                 }
-                return Date()
+                return Date().hour
             }
         }
     }
