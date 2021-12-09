@@ -93,6 +93,10 @@ final class AllDayView: UIView {
         
         containerView = style.mode == .scroll ? setupScrollView(x) : setupMoreContainerView(x)
         
+        let longTap = UILongPressGestureRecognizer(target: self, action: #selector(addNewEvent))
+        longTap.minimumPressDuration = params.style.timeline.minimumPressDuration
+        addGestureRecognizer(longTap)
+        
         addSubview(titleLabel)
         addSubview(containerView)
     }
@@ -201,6 +205,27 @@ final class AllDayView: UIView {
         
         let frame = containerView.convert(sender.frame, to: superview?.superview)
         params.delegate?.didSelectAllDayMore(items[sender.tag].map{ $0.event }, frame: frame)
+    }
+    
+    @objc func addNewEvent(gesture: UILongPressGestureRecognizer) {
+        
+        var point = gesture.location(in: self)
+        point = CGPoint(x: point.x - containerView.frame.origin.x, y: point.y)
+        let start = params.prepareEvents.first(where: { $0.xOffset < point.x && point.x < ($0.xOffset + $0.width)})?.date ?? Date()
+        
+        switch gesture.state {
+        case .began:
+            UIImpactFeedbackGenerator().impactOccurred()
+        case .ended, .failed, .cancelled:
+            var newEvent = Event(ID: Event.idForNewEvent)
+            newEvent.start = start
+            newEvent.end = Calendar.current.date(byAdding: .day, value: 1, to: start) ?? Date()
+            newEvent.text = params.style.event.textForNewEvent
+            newEvent.isAllDay = true
+            params.delegate?.didAddNewEvent(newEvent, minute: start.minute, hour: start.hour, point: point)
+        default:
+            break
+        }
     }
     
     private func createMoreButton(_ frame: CGRect, for count: Int) -> UIButton {

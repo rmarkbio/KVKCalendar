@@ -203,7 +203,7 @@ extension TimelineView {
     }
     
     func createAllDayEvents(events: [AllDayView.PrepareEvents], allDayHeight: CGFloat) {
-        guard !events.isEmpty else { return }
+        guard !events.isEmpty || style.allDay.isPinned else { return }
 
         let y: CGFloat
         if style.allDay.isPinned {
