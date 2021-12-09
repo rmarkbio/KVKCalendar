@@ -360,9 +360,11 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         if var maxEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count {
-            if style.allDay.isPinned {
-                maxEvents = maxEvents == 0 ? 1 : maxEvents
-            }
+            
+            guard maxEvents > 0 || style.allDay.isPinned else { return }
+            
+            maxEvents = maxEvents == 0 ? 1 : maxEvents
+            
             var allDayHeight = (style.allDay.height * CGFloat(maxEvents)) > style.allDay.maxHeight ? style.allDay.maxHeight : style.allDay.height * CGFloat(maxEvents)
             setOffsetScrollView(allDayEventsCount: maxEvents)
             createAllDayEvents(events: allDayEvents, allDayHeight: allDayHeight)
