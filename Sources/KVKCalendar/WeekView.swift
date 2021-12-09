@@ -341,4 +341,7 @@ extension WeekView: TimelineDelegate {
         delegate?.didDeleteEvent(event)
     }
     
+    func didSelectAllDayMore(_ events: [Event], frame: CGRect) {
+        delegate?.didSelectMore(Date(), frame: frame, events: events)
+    }
 }

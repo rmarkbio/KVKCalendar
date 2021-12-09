@@ -356,7 +356,7 @@ public protocol CalendarDelegate: AnyObject {
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?)
     
     /// tap on more fro month view
-    func didSelectMore(_ date: Date, frame: CGRect?)
+    func didSelectMore(_ date: Date, frame: CGRect?, events: [Event]?)
     
     /// The method is **DEPRECATED**
     /// Use a new **didChangeViewerFrame**
@@ -401,7 +401,7 @@ public extension CalendarDelegate {
     
     func didSelectEvent(_ event: Event, type: CalendarType, frame: CGRect?) {}
     
-    func didSelectMore(_ date: Date, frame: CGRect?) {}
+    func didSelectMore(_ date: Date, frame: CGRect?, events: [Event]?) {}
     
     func eventViewerFrame(_ frame: CGRect) {}
     

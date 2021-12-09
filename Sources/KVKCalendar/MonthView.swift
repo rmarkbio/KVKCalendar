@@ -384,8 +384,8 @@ extension MonthView: MonthCellDelegate {
         delegate?.didSelectEvent(event, type: .month, frame: frame)
     }
     
-    func didSelectMore(_ date: Date, frame: CGRect?) {
-        delegate?.didSelectMore(date, frame: frame)
+    func didSelectMore(_ date: Date, frame: CGRect?, events: [Event]?) {
+        delegate?.didSelectMore(date, frame: frame, events: events)
     }
     
     func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer) {

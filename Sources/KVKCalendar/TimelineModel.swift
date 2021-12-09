@@ -24,6 +24,7 @@ protocol TimelineDelegate: AnyObject {
     func didAddNewEvent(_ event: Event, minute: Int, hour: Int, point: CGPoint)
     func didResizeEvent(_ event: Event, startTime: ResizeTime, endTime: ResizeTime)
     func didDeleteEvent(_ event: Event)
+    func didSelectAllDayMore(_ events: [Event], frame: CGRect)
 }
 
 extension TimelineDelegate {

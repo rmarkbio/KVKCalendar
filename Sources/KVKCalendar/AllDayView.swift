@@ -29,14 +29,16 @@ final class AllDayView: UIView {
         return label
     }()
     
-    private let scrollView = UIScrollView()
+    private var containerView: UIView!
     private let linePoints: [CGPoint]
     private var params: Parameters
+    private var style: AllDayStyle
     
     let items: [[AllDayEvent]]
     
     init(parameters: Parameters, frame: CGRect) {
         self.params = parameters
+        self.style = params.style.allDay
         
         self.items = parameters.prepareEvents.compactMap({ item -> [AllDayEvent] in
             return item.events.compactMap({ AllDayEvent(date: $0.start, event: $0, xOffset: item.xOffset, width: item.width) })
@@ -68,45 +70,63 @@ final class AllDayView: UIView {
             newPoint = CGPoint(x: newWidth, y: newY)
         }
         
-        newSize.width -= params.style.allDay.offsetWidth
-        newSize.height -= params.style.allDay.offsetHeight
+        newSize.width -= style.offsetWidth
+        newSize.height -= style.offsetHeight
         newPoint.y += 1
         
         return CGRect(origin: newPoint, size: newSize)
     }
     
     private func setupView() {
-        backgroundColor = params.style.allDay.backgroundColor
-        titleLabel.removeFromSuperview()
-        scrollView.removeFromSuperview()
+        backgroundColor = style.backgroundColor
         
         let widthTitle = params.style.timeline.widthTime + params.style.timeline.offsetTimeX + params.style.timeline.offsetLineLeft
-        titleLabel.frame = CGRect(x: params.style.allDay.offsetX, y: 0,
-                                  width: widthTitle - params.style.allDay.offsetX,
-                                  height: params.style.allDay.height)
-        titleLabel.font = params.style.allDay.fontTitle
-        titleLabel.textColor = params.style.allDay.titleColor
-        titleLabel.textAlignment = params.style.allDay.titleAlignment
-        titleLabel.text = params.style.allDay.titleText
+        titleLabel.frame = CGRect(x: style.offsetX, y: 0,
+                                  width: widthTitle - style.offsetX,
+                                  height: style.height)
+        titleLabel.font = style.fontTitle
+        titleLabel.textColor = style.titleColor
+        titleLabel.textAlignment = style.titleAlignment
+        titleLabel.text = style.titleText
         
         let x = titleLabel.frame.width + titleLabel.frame.origin.x
-        let scrollFrame = CGRect(origin: CGPoint(x: x, y: 0),
-                                 size: CGSize(width: bounds.size.width - x, height: bounds.size.height))
+        
+        containerView = style.mode == .scroll ? setupScrollView(x) : setupMoreContainerView(x)
+        
+        addSubview(titleLabel)
+        addSubview(containerView)
+    }
+    
+    private func setupScrollView(_ xOffset: CGFloat ) -> UIScrollView {
+        
+        let scrollView = UIScrollView()
+        
+        let scrollFrame = CGRect(origin: CGPoint(x: xOffset, y: 0),
+                                 size: CGSize(width: bounds.size.width - xOffset, height: bounds.size.height))
         
         let maxItems = CGFloat(items.max(by: { $0.count < $1.count })?.count ?? 0)
         scrollView.frame = scrollFrame
         
         switch params.type {
         case .day:
-            scrollView.contentSize = CGSize(width: scrollFrame.width, height: (maxItems / 2).rounded(.up) * params.style.allDay.height)
+            scrollView.contentSize = CGSize(width: scrollFrame.width, height: (maxItems / 2).rounded(.up) * style.height)
         case .week:
-            scrollView.contentSize = CGSize(width: scrollFrame.width, height: maxItems * params.style.allDay.height)
+            scrollView.contentSize = CGSize(width: scrollFrame.width, height: maxItems * style.height)
         default:
             break
         }
         
-        addSubview(titleLabel)
-        addSubview(scrollView)
+        return scrollView
+    }
+    
+    private func setupMoreContainerView(_ xOffset: CGFloat) -> UIView {
+        let view = UIView()
+        view.clipsToBounds = true
+        
+        view.frame = CGRect(origin: CGPoint(x: xOffset, y: 0),
+                                 size: CGSize(width: bounds.size.width - xOffset, height: bounds.size.height))
+        
+        return view
     }
     
     private func createEventViews() {
@@ -116,29 +136,40 @@ final class AllDayView: UIView {
                 item.enumerated().forEach { (event) in
                     let frameEvent = calculateFrame(index: event.offset,
                                                     countEvents: item.count,
-                                                    width: scrollView.bounds.width,
-                                                    height: params.style.allDay.height)
-                    let eventView = AllDayEventView(style: params.style.allDay, event: event.element.event, frame: frameEvent)
+                                                    width: containerView.bounds.width,
+                                                    height: style.height)
+                    let eventView = AllDayEventView(style: style, event: event.element.event, frame: frameEvent)
                     eventView.delegate = self
-                    scrollView.addSubview(eventView)
+                    containerView.addSubview(eventView)
                 }
             }
         case .week:
             items.enumerated().forEach { item in
-                item.element.enumerated().forEach { (event) in
+                var eventsDisplayed = 0
+                for event in item.element.enumerated() {
                     let x = item.offset == 0 ? 0 : event.element.xOffset
-                    let frameEvent = CGRect(origin: CGPoint(x: x, y: params.style.allDay.height * CGFloat(event.offset)),
-                                            size: CGSize(width: event.element.width - params.style.allDay.offsetWidth,
-                                                         height: params.style.allDay.height - params.style.allDay.offsetHeight))
-                    let eventView = AllDayEventView(style: params.style.allDay, event: event.element.event, frame: frameEvent)
+                    let y = style.height * CGFloat(event.offset)
+                    let frameEvent = CGRect(origin: CGPoint(x: x, y: y),
+                                            size: CGSize(width: event.element.width - style.offsetWidth,
+                                                         height: style.height - style.offsetHeight))
+                    
+                    if style.mode == .more && isMoreRequired(for: item.element.count, added: eventsDisplayed) {
+                        let bt = createMoreButton(frameEvent, for: item.element.count - eventsDisplayed)
+                        bt.tag = item.offset
+                        containerView.addSubview(bt)
+                        break
+                    }
+    
+                    let eventView = AllDayEventView(style: style, event: event.element.event, frame: frameEvent)
                     eventView.delegate = self
-                    scrollView.addSubview(eventView)
+                    containerView.addSubview(eventView)
+                    eventsDisplayed += 1
                 }
             }
             
-            if params.style.allDay.isPinned {
+            if style.isPinned {
                 linePoints.enumerated().forEach { (point) in
-                    let x = point.offset == 0 ? scrollView.frame.origin.x : (point.element.x + scrollView.frame.origin.x)
+                    let x = point.offset == 0 ? containerView.frame.origin.x : (point.element.x + containerView.frame.origin.x)
                     let line = createVerticalLine(pointX: x)
                     addSubview(line)
                 }
@@ -148,6 +179,13 @@ final class AllDayView: UIView {
         }
     }
     
+    private func isMoreRequired(for all: Int, added: Int) -> Bool {
+        
+        let maxEvents = Int(style.maxHeight / style.height)
+        
+        return (maxEvents - added) == 1 && maxEvents < all
+    }
+    
     private func createVerticalLine(pointX: CGFloat) -> VerticalLineView {
         let frame = CGRect(x: pointX, y: 0, width: params.style.timeline.widthLine, height: bounds.height)
         let line = VerticalLineView(frame: frame)
@@ -155,6 +193,27 @@ final class AllDayView: UIView {
         line.isHidden = !params.style.week.showVerticalDayDivider
         return line
     }
+    
+    @objc private func tapMore(_ sender: UIButton) {
+        let item = items[sender.tag]
+        
+        guard let event = item.first else { return  }
+        
+        let frame = containerView.convert(sender.frame, to: superview?.superview)
+        params.delegate?.didSelectAllDayMore(items[sender.tag].map{ $0.event }, frame: frame)
+    }
+    
+    private func createMoreButton(_ frame: CGRect, for count: Int) -> UIButton {
+        let bt = UIButton(frame: frame)
+        bt.setTitle(style.moreText.replacingOccurrences(of: "%@", with: "\(count)"), for: .normal)
+        bt.setTitleColor(style.titleColor, for: .normal)
+        bt.titleLabel?.font = style.fontTitle
+        bt.contentEdgeInsets = .init(top: 0, left: 5, bottom: 0, right: 0);
+        bt.contentHorizontalAlignment = .left
+        bt.addTarget(self, action: #selector(tapMore), for: .touchUpInside)
+        return bt
+    }
+    
 }
 
 extension AllDayView: AllDayEventDelegate {
@@ -162,7 +221,6 @@ extension AllDayView: AllDayEventDelegate {
     func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
         params.delegate?.didSelectEvent(event, frame: frame)
     }
-    
 }
 
 extension AllDayView: CalendarSettingProtocol {

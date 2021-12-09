@@ -129,18 +129,6 @@ extension TimelineView {
         return UIApplication.shared.isAvailableBottomHomeIndicator ? 30 : 5
     }
     
-    func topStabStackOffsetY(allDayEventsIsPinned: Bool, eventsCount: Int, style: Style) -> CGFloat {
-        guard eventsCount > 0, allDayEventsIsPinned else {
-            return 5.0
-        }
-        
-        return (eventsCount > 4
-        ? style.allDay.maxHeight
-        : eventsCount < 2
-                ? style.allDay.height
-                : style.allDay.height * 2) + 5
-    }
-    
     var scrollableEventViews: [UIView] {
         return getAllScrollableEvents()
     }
@@ -214,15 +202,9 @@ extension TimelineView {
         eventView.deselectEvent()
     }
     
-    func createAllDayEvents(events: [AllDayView.PrepareEvents], maxEvents: Int) {
+    func createAllDayEvents(events: [AllDayView.PrepareEvents], allDayHeight: CGFloat) {
         guard !events.isEmpty else { return }
-        
-        var allDayHeight = style.allDay.height
-        if 3...4 ~= maxEvents {
-            allDayHeight *= 2
-        } else if maxEvents > 4 {
-            allDayHeight = style.allDay.maxHeight
-        }
+
         let y: CGFloat
         if style.allDay.isPinned {
             y = 0
@@ -668,5 +650,5 @@ extension TimelineView: AllDayEventDelegate {
     func didSelectAllDayEvent(_ event: Event, frame: CGRect?) {
         delegate?.didSelectEvent(event, frame: frame)
     }
-    
+
 }

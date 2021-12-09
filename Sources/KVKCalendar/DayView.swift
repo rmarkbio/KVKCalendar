@@ -284,6 +284,10 @@ extension DayView: TimelineDelegate {
         delegate?.didDeleteEvent(event)
     }
     
+    func didSelectAllDayMore(_ events: [Event], frame: CGRect) {
+        //
+    }
+    
 }
 
 extension DayView: CalendarSettingProtocol {

@@ -211,7 +211,7 @@ final class MonthCell: UICollectionViewCell {
     @objc private func tapOnMore(gesture: UITapGestureRecognizer) {
         if let idx = events.firstIndex(where: { $0.start.day == gesture.view?.tag }) {
             let newFrame = superview?.superview?.convert(frame, from: superview)
-            delegate?.didSelectMore(events[idx].start, frame: newFrame)
+            delegate?.didSelectMore(events[idx].start, frame: newFrame, events: events)
         }
     }
     
@@ -433,7 +433,7 @@ extension MonthCell: PointerInteractionProtocol {
 
 protocol MonthCellDelegate: AnyObject {
     func didSelectEvent(_ event: Event, frame: CGRect?)
-    func didSelectMore(_ date: Date, frame: CGRect?)
+    func didSelectMore(_ date: Date, frame: CGRect?, events: [Event]?)
     func didStartMoveEvent(_ event: EventViewGeneral, snapshot: UIView?, gesture: UILongPressGestureRecognizer)
     func didEndMoveEvent(gesture: UILongPressGestureRecognizer)
     func didChangeMoveEvent(gesture: UIPanGestureRecognizer)

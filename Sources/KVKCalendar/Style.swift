@@ -398,6 +398,7 @@ public struct YearStyle {
 public struct AllDayStyle {
     public var backgroundColor: UIColor = gainsboro
     public var titleText: String = "all-day"
+    public var moreText: String = " +%@ more"
     public var titleColor: UIColor = .black
     public var titleAlignment: NSTextAlignment = .center
     public var textColor: UIColor = .black
@@ -425,6 +426,12 @@ public struct AllDayStyle {
     @available(swift, deprecated: 0.5.0)
     public enum AxisMode: Int {
         case horizontal, vertical
+    }
+    
+    public var mode: ExpandMode = .scroll
+    
+    public enum ExpandMode: Int {
+        case scroll, more
     }
 }
 

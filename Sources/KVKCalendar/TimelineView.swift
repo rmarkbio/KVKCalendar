@@ -360,15 +360,14 @@ final class TimelineView: UIView, EventDateProtocol, CalendarTimer {
         }
         
         if let maxEvents = allDayEvents.max(by: { $0.events.count < $1.events.count })?.events.count, maxEvents > 0 {
+            var allDayHeight = (style.allDay.height * CGFloat(maxEvents)) > style.allDay.maxHeight ? style.allDay.maxHeight : style.allDay.height * CGFloat(maxEvents)
             setOffsetScrollView(allDayEventsCount: maxEvents)
-            createAllDayEvents(events: allDayEvents, maxEvents: maxEvents)
+            createAllDayEvents(events: allDayEvents, allDayHeight: allDayHeight)
             dates.enumerated().forEach { (idx, date) in
                 let pointX: CGFloat = idx == 0 ? leftOffset : CGFloat(idx) * widthPage + leftOffset
     
                 if !style.timeline.isHiddenStubEvent, let day = date?.day {
-                    let y = topStabStackOffsetY(allDayEventsIsPinned: style.allDay.isPinned,
-                                                eventsCount: maxEvents,
-                                                style: style)
+                    let y =  style.allDay.isPinned ? allDayHeight : 5.0
                     let topStackFrame = CGRect(x: pointX, y: y, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
                     let bottomStackFrame = CGRect(x: pointX, y: frame.height - bottomStabStackOffsetY, width: widthPage - style.timeline.offsetEvent, height: style.event.heightStubView)
                     
