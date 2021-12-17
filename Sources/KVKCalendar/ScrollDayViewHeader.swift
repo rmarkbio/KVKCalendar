@@ -134,7 +134,7 @@ final class ScrollDayHeaderView: UIView {
         
         date = nextDate
         if needScrollToDate {
-            scrollToDate(date, isAnimate: true, isDelay: false)
+            scrollToDate(date, isAnimate: style.headerScroll.isAnimateTitleDate, isDelay: false)
         } else {
             selectDate(date, type: type)
         }
